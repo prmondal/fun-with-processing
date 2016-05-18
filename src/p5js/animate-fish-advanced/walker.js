@@ -83,11 +83,12 @@ walker.prototype.getCorrectVelocity = function(velocity) {
     }
     
     //if the fish travels outside the tank reverse velocity direction
-    if(tempPos.x <= sprites[0].width / 2 || tempPos.x >= width - sprites[0].width / 2) {
+    //sprite origin is at center
+    if(tempPos.x <= sprites[0].width / (2 * spriteScaleDownFactor) || tempPos.x >= width - sprites[0].width / (2 * spriteScaleDownFactor)) {
       velocity.x *= -1;
     }
     
-    if(tempPos.y <= sprites[0].height / 2 || tempPos.y >= height - sprites[0].height / 2) {
+    if(tempPos.y <= sprites[0].height / (2 * spriteScaleDownFactor) || tempPos.y >= height - sprites[0].height / (2 * spriteScaleDownFactor)) {
       velocity.y *= -1;
     }
     
