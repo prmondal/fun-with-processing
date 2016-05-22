@@ -25,8 +25,8 @@ function setup() {
 
 function createWalkers() {
   for(var i = 0; i < numberWalkers; i++) {
-    var scaleDF = random(2, 4);
-    walkers.push(new walker(random(sprites[0].width / scaleDF, winWidth - sprites[0].width / scaleDF), random(sprites[0].height / scaleDF, winHeight - sprites[0].height / scaleDF), scaleDF));
+    var sdf = random(2, 4);
+    walkers.push(new walker(random(2 * sprites[0].width / sdf, width - 2 * sprites[0].width / sdf), random(2 * sprites[0].height / sdf, height - 2 * sprites[0].height / sdf), sdf));
   }
 }
 

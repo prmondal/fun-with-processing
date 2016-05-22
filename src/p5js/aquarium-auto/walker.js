@@ -34,6 +34,7 @@ walker.prototype.draw = function() {
   angle = this.vel.heading();
   rotate(angle);
   
+  //correct orientation of fish
   if(angle >= PI / 2 || angle <= -PI / 2) scale(1, -1);
   
   translate(-this.pos.x, -this.pos.y);
@@ -73,7 +74,7 @@ walker.prototype.getCorrectVelocity = function(velocity) {
     }
     
     //if the fish travels outside the tank reverse velocity direction
-    var sdf = 2 * this.spriteScaleDownFactor;
+    var sdf = this.spriteScaleDownFactor;
     
     if(tempPos.x <= sprites[0].width / sdf || tempPos.x >= width - sprites[0].width / sdf) {
       velocity.x *= -1;
