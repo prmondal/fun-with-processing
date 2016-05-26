@@ -2,8 +2,8 @@ var walkers = [];
 var numberWalkers;
 var canvas;
 var fishTankBackground;
-var winWidth = 1000;
-var winHeight = 600;
+var winWidth = 1600;
+var winHeight = 900;
 var sprites = [];
 
 function loadSprites() {
