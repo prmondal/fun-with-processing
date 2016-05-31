@@ -39,7 +39,7 @@ Particle.prototype.applyForce = function(force) {
 };
 
 Particle.prototype.update = function() {
-  this.velocity.add(this.accelaration).mult(this.damping);
+  this.velocity.add(this.accelaration).mult((this.damping === 0) ? 1 : this.damping);
   this.velocity.x = Math.round(this.velocity.x * 1000) / 1000;
   this.velocity.y = Math.round(this.velocity.y * 1000) / 1000;
   this.pos.add(this.velocity);
