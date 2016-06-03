@@ -1,5 +1,5 @@
 var canvas;
-var numOfParticles = 10;
+var numOfParticles = 50;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);

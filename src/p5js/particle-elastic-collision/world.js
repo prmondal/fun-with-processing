@@ -11,7 +11,7 @@ var World = {
     for(var i = 0, l = this.particles.length; i < l; i++) {
         for(var j = 0; j < l && i !== j; j++) {
             if(this.collide(this.particles[i], this.particles[j])) {
-              this.resolveCollision(this.particles[i], this.particles[j]);
+              this.resolveCollision(this.particles[i], this.particles[j]); //TODO: Fix a bug where sometimes balls get appended
             }
         }
     }
@@ -23,6 +23,14 @@ var World = {
   
   createParticle: function() {
     var p = new Particle();
+    
+    //if this particle collides with any other particle return
+    for(var i = 0, l = this.particles.length; i < l; i++) {
+      if(this.collide(p, this.particles[i])) {
+        p = null;
+        return;
+      }
+    }
     
     //apply gravity
     p.applyGravity(createVector(0, this.gravity * p.mass));
@@ -36,31 +44,6 @@ var World = {
     for(var i = 0; i < n; i++) {
       this.createParticle();
     }
-    
-    /*
-    //TODO: Remove overlapping balls
-    //remove collided balls from list
-    var removedPairs = [];
-    
-    for(var i = 0, l = this.particles.length; i < l; i++) {
-        for(var j = 0; j < l && i !== j; j++) {
-            if(this.collide(this.particles[i], this.particles[j])) {
-              removedPairs.push([i, j, false, false]);
-            }
-        }
-    }
-    
-    removedPairs.forEach(function(p) {
-      if(!p[2]) {
-        self.particles.splice(p[0], 1);
-        p[2] = true;
-      }
-      
-      if(!p[3]) {
-        self.particles.splice(p[1], 1);
-        p[3] = true;
-      }
-    });*/
   },
   
   collide: function(p1, p2) {

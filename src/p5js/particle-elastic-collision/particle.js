@@ -1,9 +1,9 @@
 function Particle() {
-  this.size = random(20, 60);
+  this.size = random(20, 80);
   this.color = {r: random(0, 255), g: random(0, 255), b: random(0, 255)};
   this.mass = this.size / 10;
-  this.pos = createVector(random(this.size, width - this.size), random(this.size, height - this.size)); //TODO: no overlap particles
-  this.velocity = createVector(random(-5, 5), random(-5, 5));
+  this.pos = createVector(random(this.size, width - this.size), random(this.size, height - this.size));
+  this.velocity = createVector(random(-2, 2), random(-2, 2));
   this.accelaration = createVector(0, 0);
   
   this.boundToWall = function() {
