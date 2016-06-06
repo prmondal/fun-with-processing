@@ -1,5 +1,5 @@
 function Particle() {
-  this.size = random(20, 80);
+  this.size = Math.ceil(random(20, 80));
   this.color = {r: random(0, 255), g: random(0, 255), b: random(0, 255)};
   this.oldColor = this.color;
   this.mass = this.size / 10;

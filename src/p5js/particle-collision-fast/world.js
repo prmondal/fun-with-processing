@@ -1,9 +1,9 @@
 var World = {
   gravity: 0.0,
   damping: 0.0,
+  bruteForceCDEnabled: false,
   particles: [],
-  countNumberOfParticles: 0,
-  kdTree: null,
+  kdTree: new kdTree(2),
   
   //modified distance function which finds closest particle considering the boundary
   distanceCompareFn: function(a, b) {
@@ -17,30 +17,31 @@ var World = {
     this.particles.forEach(function(p) {p.update();});
     
     //elastic collision
-    for(var i = 0, l = this.particles.length; i < l; i++) {
-      //find nearest particle to the current particle
-      //shift pos to epsilon amount 
-      this.updateNearest(this.particles[i]);
-      
-      //if the collision resolve is already completed on nearest ignore it
-      if(this.particles[i].toNearest !== null && this.particles[i].toNearest === this.particles[i].nearest) {
-        continue;
+    if(this.bruteForceCDEnabled) {
+       for(var i = 0, l = this.particles.length; i < l; i++) {
+          for(var j = 0; j < l && i !== j; j++) {
+              if(this.collide(this.particles[i], this.particles[j])) {
+                this.resolveCollision(this.particles[i], this.particles[j]); //TODO: Fix a bug where sometimes balls get appended
+              }
+          }
       }
-      
-      this.particles[i].nearest.toNearest = this.particles[i];
-      
-      //resolve collision with neareast and current particle
-      this.resolveCollision(this.particles[i], this.particles[i].nearest); //TODO: Fix a bug where sometimes balls get appended 
-    }
-    
-    
-    /*for(var i = 0, l = this.particles.length; i < l; i++) {
-        for(var j = 0; j < l && i !== j; j++) {
-            if(this.collide(this.particles[i], this.particles[j])) {
-              this.resolveCollision(this.particles[i], this.particles[j]); //TODO: Fix a bug where sometimes balls get appended
-            }
+    } else {
+      for(var i = 0, l = this.particles.length; i < l; i++) {
+        //find nearest particle to the current particle
+        //shift pos to epsilon amount 
+        this.updateNearest(this.particles[i]);
+        
+        //if the collision resolve is already completed on nearest ignore it
+        if(this.particles[i].toNearest !== null && this.particles[i].toNearest === this.particles[i].nearest) {
+          continue;
         }
-    }*/
+        
+        this.particles[i].nearest.toNearest = this.particles[i];
+        
+        //resolve collision with neareast and current particle
+        this.resolveCollision(this.particles[i], this.particles[i].nearest); //TODO: Fix a bug where sometimes balls get appended 
+      } 
+    }
   },
   
   draw: function() {
@@ -74,8 +75,6 @@ var World = {
       }
     }
     
-    //this.countNumberOfParticles++;
-    
     //apply gravity
     p.applyGravity(createVector(0, this.gravity * p.mass));
     
@@ -84,15 +83,16 @@ var World = {
   
   createRandomParticles: function(n) {
     var self = this;
+    var countNumberOfParticles = 0;
     
     //keep generating till n particles are created
-    while(this.countNumberOfParticles < n) {
+    while(countNumberOfParticles <= n) {
       this.createParticle();
-      this.countNumberOfParticles++;
+      countNumberOfParticles++;
     }
     
     //build kd-tree
-    this.kdTree = new kdTree(this.particles, 2);
+    this.kdTree.build(this.particles);
   },
   
   collide: function(p1, p2) {

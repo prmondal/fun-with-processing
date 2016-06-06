@@ -1,6 +1,6 @@
 var canvas;
 var timer = 0;
-var numberOfParticles = 500;
+var numberOfParticles = 50;
 var fps;
 
 function setup() {

@@ -10,13 +10,6 @@ function kdTree(list, k) {
   this.best = null;
   this.bestDist = Infinity;
   
-  this.copy = function(list, s, e) {
-    var copyList = [];
-  
-    for(var i = s; i <= e; i++) copyList.push(list[i]);
-    return copyList;
-  },
-  
   this.root = this.build(0, 0, this.list.length - 1, this.list);
 }
 
@@ -40,14 +33,11 @@ kdTree.prototype.build = function(depth, s, e, list) {
   e = list.length - 1;
   
   var m = Math.ceil(s + (e - s) / 2);
-  var leftList = this.copy(list, s, m - 1);
-  var rightList = this.copy(list, m + 1, e);
   
   var root = new node();
-  
   root.data = list[m];
-  root.left = this.build(depth + 1, s, m - 1, leftList);
-  root.right = this.build(depth + 1, m + 1, e, rightList);
+  root.left = this.build(depth + 1, s, m - 1, list.slice(s, m));
+  root.right = this.build(depth + 1, m + 1, e, list.slice(m + 1, e + 1));
   
   return root;
 };
