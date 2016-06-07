@@ -1,5 +1,5 @@
 function Particle() {
-  this.size = Math.ceil(random(20, 80));
+  this.size = 20;
   this.color = {r: random(0, 255), g: random(0, 255), b: random(0, 255)};
   this.oldColor = this.color;
   this.mass = this.size / 10;
@@ -7,7 +7,7 @@ function Particle() {
   this.velocity = createVector(random(-2, 2), random(-2, 2));
   this.accelaration = createVector(0, 0);
   this.nearest = null;
-  this.toNearest = null; //from which particle it is nearest to. used for collision resolve
+  this.roundOffFactor = 1000;
   
   this.boundToWall = function() {
     if(this.pos.x - this.size / 2 <= 0) {
@@ -42,10 +42,11 @@ Particle.prototype.applyForce = function(force) {
 
 Particle.prototype.update = function() {
   this.velocity.add(this.accelaration).mult((World.damping === 0.0) ? 1 : World.damping);
-  this.velocity.x = Math.round(this.velocity.x * 1000) / 1000;
-  this.velocity.y = Math.round(this.velocity.y * 1000) / 1000;
+  this.velocity.x = Math.round(this.velocity.x * this.roundOffFactor) / this.roundOffFactor;
+  this.velocity.y = Math.round(this.velocity.y * this.roundOffFactor) / this.roundOffFactor;
   this.pos.add(this.velocity);
-  
+  this.pos.x = Math.round(this.pos.x * this.roundOffFactor) / this.roundOffFactor;
+  this.pos.y = Math.round(this.pos.y * this.roundOffFactor) / this.roundOffFactor;
   this.boundToWall();
 };
 

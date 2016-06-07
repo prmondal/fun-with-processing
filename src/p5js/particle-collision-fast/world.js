@@ -1,45 +1,35 @@
 var World = {
   gravity: 0.0,
   damping: 0.0,
+  collisionEpsilon: 0, //need to identify, may solve append problem
   bruteForceCDEnabled: false,
   particles: [],
   kdTree: new kdTree(2),
   
-  //modified distance function which finds closest particle considering the boundary
-  distanceCompareFn: function(a, b) {
-    var dir = a.pos.copy().sub(b.pos).normalize();
-    var closestBoundaryPointBtoA = b.pos.copy().add(dir.mult(b.size / 2));
-    
-    return (a.pos.x - closestBoundaryPointBtoA.x) * (a.pos.x - closestBoundaryPointBtoA.x) + (a.pos.y - closestBoundaryPointBtoA.y) * (a.pos.y - closestBoundaryPointBtoA.y);
+  distanceFn: function(a, b) {
+    return (a.pos.x - b.pos.x) * (a.pos.x - b.pos.x) + (a.pos.y - b.pos.y) * (a.pos.y - b.pos.y);
   },
   
   update: function() {
     this.particles.forEach(function(p) {p.update();});
+    this.kdTree.build(this.particles); //problem of kd-tree
     
     //elastic collision
     if(this.bruteForceCDEnabled) {
        for(var i = 0, l = this.particles.length; i < l; i++) {
           for(var j = 0; j < l && i !== j; j++) {
               if(this.collide(this.particles[i], this.particles[j])) {
-                this.resolveCollision(this.particles[i], this.particles[j]); //TODO: Fix a bug where sometimes balls get appended
+                this.resolveCollision(this.particles[i], this.particles[j]);
               }
           }
       }
     } else {
       for(var i = 0, l = this.particles.length; i < l; i++) {
         //find nearest particle to the current particle
-        //shift pos to epsilon amount 
         this.updateNearest(this.particles[i]);
         
-        //if the collision resolve is already completed on nearest ignore it
-        if(this.particles[i].toNearest !== null && this.particles[i].toNearest === this.particles[i].nearest) {
-          continue;
-        }
-        
-        this.particles[i].nearest.toNearest = this.particles[i];
-        
         //resolve collision with neareast and current particle
-        this.resolveCollision(this.particles[i], this.particles[i].nearest); //TODO: Fix a bug where sometimes balls get appended 
+        this.resolveCollision(this.particles[i], this.particles[i].nearest);
       } 
     }
   },
@@ -59,7 +49,7 @@ var World = {
     var idx = 0, l = this.particles.length;
     
     //change color of nearest particle
-    this.kdTree.findNearest(this.kdTree.root, queryPoint, this.distanceCompareFn, 0);
+    this.kdTree.findNearest(this.kdTree.root, queryPoint, this.distanceFn, 0);
     queryPoint.nearest = this.kdTree.best;
     this.kdTree.reset();
   },
@@ -96,16 +86,17 @@ var World = {
   },
   
   collide: function(p1, p2) {
-    return 4 * (p1.pos.copy().sub(p2.pos)).magSq() < (p1.size + p2.size) * (p1.size + p2.size);
+    //tiny gap is maintained between particle collision checking
+    return 4 * (p1.pos.copy().sub(p2.pos)).magSq() - this.collisionEpsilon < (p1.size + p2.size) * (p1.size + p2.size);
   },
   
-  resolveCollision: function(p1, p2) {
+  resolveCollision: function(p1, p2) { //TODO: Fix a bug where sometimes balls get appended
     if(!this.collide(p1, p2)) return;
     
-    var collisionAngle = atan2(p2.pos.y - p1.pos.y, p2.pos.x - p1.pos.x);
+    var collisionAngle = p2.pos.copy().sub(p1.pos).heading();
     
-    var p1Dir = atan2(p1.velocity.y, p1.velocity.x),
-        p2Dir = atan2(p2.velocity.y, p2.velocity.x),
+    var p1Dir = p1.velocity.heading();
+        p2Dir = p2.velocity.heading();
         p1uMag = p1.velocity.mag(),
         p2uMag = p2.velocity.mag();
     
@@ -114,11 +105,11 @@ var World = {
         p1uY = p1uMag * sin(p1Dir - collisionAngle),
         p2uX = p2uMag * cos(p2Dir - collisionAngle),
         p2uY = p2uMag * sin(p2Dir - collisionAngle),
-        p1vX, p1vY, p2vX, p2vY, p1FinalVX, p1FinalVY, p2FinalVX, p2FinalVY;
+        p1vX, p1vY, p2vX, p2vY, p1FinalVX, p1FinalVY, p2FinalVX, p2FinalVY, totalMass = p1.mass + p2.mass;
         
     //conservation of momentum in each direction
-    p1vX = (p1uX * (p1.mass - p2.mass) + 2 * p2.mass * p2uX) / (p1.mass + p2.mass);
-    p2vX = (p2uX * (p2.mass - p1.mass) + 2 * p1.mass * p1uX) / (p1.mass + p2.mass);
+    p1vX = (p1uX * (p1.mass - p2.mass) + 2 * p2.mass * p2uX) / totalMass;
+    p2vX = (p2uX * (p2.mass - p1.mass) + 2 * p1.mass * p1uX) / totalMass;
     p1vY = p1uY; //no collision in y-direction
     p2vY = p2uY;
     
