@@ -7,6 +7,7 @@ function Particle() {
   this.velocity = createVector(random(-2, 2), random(-2, 2));
   this.accelaration = createVector(0, 0);
   this.nearest = null;
+  this.nearestDist = Infinity;
   this.roundOffFactor = 1000;
   
   this.boundToWall = function() {

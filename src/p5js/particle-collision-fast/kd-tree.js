@@ -1,22 +1,36 @@
+function pqNode() {
+  this.distance = Infinity;
+  this.data = null;
+}
+
 function node() {
   this.data = 0;
   this.left = null;
   this.right = null;
+  
+  this.isLeafNode = function() {
+    return this.left === null && this.right === null;
+  };
 }
 
 function kdTree(k) {
   this.list = [];
   this.k = k;
-  this.best = null;
-  this.bestDist = Infinity;
+  this.nnSize = 2;
+  this.minPQ = new buckets.PriorityQueue(function(a, b) {
+    if(a.distance < b.distance) return -1;
+    if(a.distance > b.distance) return 1;
+    return 0;
+  });
+  
   this.size = 0;
   this.root = null;
   
   this.manhattanDist = function(splitDimension, p1, p2) {
     if(splitDimension === 0) {
-      return Math.abs(p1.pos.x - p2.pos.x);
+      return p1.pos.x - p2.pos.x;
     } else if(splitDimension === 1){
-      return Math.abs(p1.pos.y - p2.pos.y);
+      return p1.pos.y - p2.pos.y;
     }
   };
 }
@@ -98,30 +112,26 @@ kdTree.prototype.traverse = function(root) {
   return;
 };
 
-//Implement 2-NN to avoid getting same particle against the particle queried
+//todo: describe the algo
 kdTree.prototype.findNearest = function(root, queryPoint, distanceFn, depth) {
   if(!root) return;
   
-  //TODO 
-  if(root.data.pos.equals(queryPoint.pos)) {
-    this.findNearest(root.left, queryPoint, distanceFn, depth + 1);
-    this.findNearest(root.right, queryPoint, distanceFn, depth + 1);
-    
-    return;
+  var currDist = distanceFn(queryPoint, root.data);
+  
+  //insert into minPQ
+  var pqnode = new pqNode();
+  pqnode.distance = currDist;
+  pqnode.data = root.data;
+  
+  this.minPQ.add(pqnode);
+  
+  //minPQ should contains at most nnSize elements
+  if(this.minPQ.size() > this.nnSize) {
+    this.minPQ.dequeue();
   }
   
-  //compare query point with current node data
-  var currDist = distanceFn(queryPoint, root.data); //distance squared
-  
-  //update nearest
-  if(currDist < this.bestDist) {
-    this.best = root.data;
-    this.bestDist = currDist;
-  }
-  
-  //recur to specific subtree depends on splitting dimension
-  var sd = depth % this.k;
-  var manhattanDist = this.manhattanDist(sd, queryPoint, root.data);
+  var sd = depth % this.k,
+    manhattanDist = this.manhattanDist(sd, queryPoint, root.data);
   
   if(manhattanDist < 0) {
     this.findNearest(root.left, queryPoint, distanceFn, depth + 1);
@@ -129,10 +139,8 @@ kdTree.prototype.findNearest = function(root, queryPoint, distanceFn, depth) {
     this.findNearest(root.right, queryPoint, distanceFn, depth + 1);
   }
   
-  //check if the hypersphere with best distance crosses the splitting hyperplane
-  //if so check in other subtree to find the nearest
-  if(manhattanDist < this.bestDist) {//CHECK squared
-    //check in other subtree
+  //recur to other subtree if minPQ does not contain atleast nnSize or if the plane distance is less than the maximum priority element distance
+  if(this.minPQ.size() < this.nnSize || manhattanDist * manhattanDist < this.minPQ.peek().distance) {
     if(manhattanDist < 0) {
       this.findNearest(root.right, queryPoint, distanceFn, depth + 1);
     } else {
@@ -142,6 +150,5 @@ kdTree.prototype.findNearest = function(root, queryPoint, distanceFn, depth) {
 };
 
 kdTree.prototype.reset = function() {
-  this.best = null;
-  this.bestDist = Infinity;
+  this.minPQ.clear();
 };

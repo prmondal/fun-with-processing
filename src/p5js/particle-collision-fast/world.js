@@ -29,7 +29,7 @@ var World = {
         this.updateNearest(this.particles[i]);
         
         //resolve collision with neareast and current particle
-        this.resolveCollision(this.particles[i], this.particles[i].nearest);
+        if(this.particles[i].nearest) this.resolveCollision(this.particles[i], this.particles[i].nearest);
       } 
     }
   },
@@ -44,13 +44,16 @@ var World = {
     text("FPS: " + fps, 15, 15);
   },
   
-  //change color of nearest particle to the particle seleted by mouse
   updateNearest: function(queryPoint) {
     var idx = 0, l = this.particles.length;
     
-    //change color of nearest particle
     this.kdTree.findNearest(this.kdTree.root, queryPoint, this.distanceFn, 0);
-    queryPoint.nearest = this.kdTree.best;
+    
+    //find the nearest excluding the query point
+    queryPoint.nearest = this.kdTree.minPQ.peek().data;
+    queryPoint.nearestDist = this.kdTree.minPQ.peek().distance;
+    
+    //reset kdTree
     this.kdTree.reset();
   },
   
