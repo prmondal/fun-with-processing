@@ -1,13 +1,3 @@
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
-}
-
-function BBox(min, max) {
-  this.min = min;
-  this.max = max;
-}
-
 function Particle() {
   this.size = 20;
   this.color = {r: random(0, 255), g: random(0, 255), b: random(0, 255)};
@@ -17,7 +7,6 @@ function Particle() {
   this.velocity = createVector(random(-2, 2), random(-2, 2));
   this.accelaration = createVector(0, 0);
   this.nearest = null;
-  this.nearestDist = Infinity;
   this.roundOffFactor = 1000;
   
   this.boundToWall = function() {
@@ -80,6 +69,7 @@ Particle.prototype.clone = function() {
   clone.mass = this.mass;
   clone.color = this.color;
   clone.oldColor = this.oldColor;
+  clone.nearest = null;
   return clone;
 };
 
@@ -92,5 +82,15 @@ Particle.prototype.equals = function(p) {
 };
 
 Particle.prototype.getSqauredDistance = function(p) {
-  return this.pos.x * p.pos.x + this.pos.y * p.pos.y;
+  return (this.pos.x - p.pos.x) * (this.pos.x - p.pos.x) + (this.pos.y - p.pos.y) * (this.pos.y - p.pos.y);
 };
+
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
+function BBox(min, max) {
+  this.min = min;
+  this.max = max;
+}

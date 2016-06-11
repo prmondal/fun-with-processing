@@ -1,13 +1,13 @@
 var canvas;
 var timer = 0;
-var numberOfParticles = 500;
+var maxNumberOfParticles = 100;
 var fps;
 
 function setup() {
-  canvas = createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(800, 600);
   fps = Math.ceil(frameRate());
   
-  World.createRandomParticles(numberOfParticles);
+  World.createRandomParticles(maxNumberOfParticles);
 }
 
 function draw() {
@@ -20,9 +20,15 @@ function draw() {
     timer = millis();
   }
   
-  World.drawFPS(fps);
+  if(World.drawFPS) World.drawFPS(fps);
 }
 
 function update() {
   World.update();
+}
+
+function mousePressed() {
+  if(mouseButton === LEFT) {
+    if(World.debugDraw) World.highlightNearest(createVector(mouseX, mouseY));
+  }
 }

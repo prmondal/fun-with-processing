@@ -3,7 +3,7 @@ function SpatialHash(width, height, cellSize) {
   this.height = height;
   this.cellSize = cellSize;
   
-  this.gridSize = (this.width * this.height) / (this.cellSize * this.cellSize);
+  this.gridSize = Math.floor((this.width * this.height) / (this.cellSize * this.cellSize));
   this.buckets = [];
   
   //create buckets
@@ -19,8 +19,8 @@ SpatialHash.prototype.getHash = function getHash(point) {
   return Math.floor(point.x / this.cellSize) + Math.floor(point.y / this.cellSize) * this.width / this.cellSize;
 };
 
-SpatialHash.prototype.getCollidedBuckets = function(obj) {
-  var collidedBuckets = [];
+SpatialHash.prototype.getCollidedBucketsIdx = function(obj) {
+  var collidedBucketsIdx = [];
   
   //object can span upto multiple cells
   //use bbox of object to find all overlapping cells and add this object to buckets to corresponding cells
@@ -36,34 +36,36 @@ SpatialHash.prototype.getCollidedBuckets = function(obj) {
   //insert this object in all overlapping cell's buckets
   for(var i = topLeftCell; i <= topRightCell; i++) {
     for(var j = i, verticalCellIndexStepSize = this.width / this.cellSize; j <= downRightCell; j += verticalCellIndexStepSize) {
-      collidedBuckets.push(this.buckets[j]);
+      collidedBucketsIdx.push(j);
     }
   }
   
-  return collidedBuckets;
+  return collidedBucketsIdx;
 };
 
 SpatialHash.prototype.insert = function(obj) {
   if(!obj) return;
   
-  var collidedBuckets = this.getCollidedBuckets(obj);
-  
-  collidedBuckets.forEach(function(b) {
-    b.push(obj);
+  var self = this;
+  var collidedBucketsIdx = this.getCollidedBucketsIdx(obj);
+
+  collidedBucketsIdx.forEach(function(idx) {
+    if(self.buckets[idx])self.buckets[idx].push(obj.clone());
   });
 };
 
 //broad phase
-SpatialHash.prototype.getNearest = function(obj) {
+SpatialHash.prototype.findNearest = function(obj) {
   if(!obj) return;
   
-  var collidedBuckets = this.getCollidedBuckets(obj);
+  var self = this;
+  var collidedBucketsIdx = this.getCollidedBucketsIdx(obj);
   
   //remove duplicate and create a new list of all possible colliding objects
   var nearbyObjectSet = new buckets.Set(function(obj) {return obj.pos.x + ' ' + obj.pos.y;});
   
-  collidedBuckets.forEach(function(b) {
-    b.forEach(function(o) {
+  collidedBucketsIdx.forEach(function(idx) {
+    if(self.buckets[idx]) self.buckets[idx].forEach(function(o) {
       if(!obj.equals(o))
         nearbyObjectSet.add(o);
     });
@@ -86,12 +88,31 @@ SpatialHash.prototype.getNearest = function(obj) {
   return best;
 };
 
+SpatialHash.prototype.findNearby = function(obj) {
+  if(!obj) return;
+  
+  var self = this;
+  var collidedBucketsIdx = this.getCollidedBucketsIdx(obj);
+  
+  //remove duplicate and create a new list of all possible colliding objects
+  var nearbyObjectSet = new buckets.Set(function(obj) {return obj.pos.x + ' ' + obj.pos.y;});
+  
+  collidedBucketsIdx.forEach(function(idx) {
+    if(self.buckets[idx]) self.buckets[idx].forEach(function(o) {
+      if(!obj.equals(o))
+        nearbyObjectSet.add(o);
+    });
+  });
+  
+  return nearbyObjectSet.toArray();
+};
+
 SpatialHash.prototype.clear = function() {
   this.buckets = [];
   this.fill();
 };
 
-SpatialHash.prototype.populate = function(list) {
+SpatialHash.prototype.build = function(list) {
   var self = this;
   
   list.forEach(function(o) {

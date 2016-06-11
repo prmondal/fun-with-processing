@@ -3,16 +3,17 @@ var World = {
   damping: 0.0,
   collisionEpsilon: 0, //need to identify, may solve append problem
   bruteForceCDEnabled: false,
+  debugDraw: false,
+  drawFPS: true,
+  drawNumberOfParticles: true,
   particles: [],
-  kdTree: new kdTree(2),
-  
-  distanceFn: function(a, b) {
-    return (a.pos.x - b.pos.x) * (a.pos.x - b.pos.x) + (a.pos.y - b.pos.y) * (a.pos.y - b.pos.y);
-  },
+  numberOfParticles: 0,
+  spatialHash: new SpatialHash(800, 600, 25), //Challenge to find good value of cell size
   
   update: function() {
     this.particles.forEach(function(p) {p.update();});
-    this.kdTree.build(this.particles); //problem of kd-tree
+    this.spatialHash.clear();
+    this.spatialHash.build(this.particles);
     
     //elastic collision
     if(this.bruteForceCDEnabled) {
@@ -36,25 +37,75 @@ var World = {
   
   draw: function() {
     this.particles.forEach(function(p) {p.draw();});
+    
+    if(this.debugDraw) {
+      //draw grid
+      strokeWeight(0.5);
+      stroke(255);
+        
+      for(var i = 0; i < this.spatialHash.width; i += this.spatialHash.cellSize) {
+        line(i, 0, i, this.spatialHash.height);
+      }
+      
+      for(var i = 0; i < this.spatialHash.height; i += this.spatialHash.cellSize) {
+        line(0, i, this.spatialHash.width, i);
+      }
+    }
+    
+    if(this.drawNumberOfParticles) this.drawParticlesNumber();
   },
   
   drawFPS: function(fps) {
-    textSize(12);
+    textSize(10);
     fill(255);
-    text("FPS: " + fps, 15, 15);
+    text("fps: " + fps, 15, 15);
+  },
+  
+  drawParticlesNumber: function() {
+    textSize(10);
+    fill(255);
+    text('Particles Count: ' + this.numberOfParticles, 15, 30);
+  },
+  
+  highlightNearest: function (click) {
+    var selectedParticle;
+    
+    for(var i = 0, l = this.particles.length; i < l; i++) {
+      if(this.particles[i].contains(click)) {
+        selectedParticle = this.particles[i];
+        break;
+      }
+    }
+    
+    if(selectedParticle) {
+      /*
+      //find nearest
+      //this.updateNearest(selectedParticle);
+      
+      if(selectedParticle.nearest) {
+        selectedParticle.nearest.color = {r: 255, g: 255, b:255};
+        
+        setTimeout(function() {
+           selectedParticle.nearest.color =  selectedParticle.nearest.oldColor;
+        }, 100);
+      }*/
+      
+      //find all nearby
+      var nearby = this.spatialHash.findNearby(selectedParticle);
+      
+      //change color of nearby particles
+      nearby.forEach(function(p) {
+        p.color = {r: 255, g: 255, b:255};
+        
+        setTimeout(function() {
+           p.color =  p.oldColor;
+        }, 100);
+      });
+    }
   },
   
   updateNearest: function(queryPoint) {
-    var idx = 0, l = this.particles.length;
-    
-    this.kdTree.findNearest(this.kdTree.root, queryPoint, this.distanceFn, 0);
-    
-    //find the nearest excluding the query point
-    queryPoint.nearest = this.kdTree.minPQ.peek().data;
-    queryPoint.nearestDist = this.kdTree.minPQ.peek().distance;
-    
-    //reset kdTree
-    this.kdTree.reset();
+    queryPoint.nearest = this.spatialHash.findNearest(queryPoint);
   },
   
   createParticle: function() {
@@ -74,18 +125,18 @@ var World = {
     this.particles.push(p);
   },
   
-  createRandomParticles: function(n) {
+  createRandomParticles: function(maxParticleSize) {
     var self = this;
     var countNumberOfParticles = 0;
     
     //keep generating till n particles are created
-    while(countNumberOfParticles <= n) {
+    while(countNumberOfParticles <= maxParticleSize) {
       this.createParticle();
       countNumberOfParticles++;
     }
     
-    //build kd-tree
-    this.kdTree.build(this.particles);
+    this.numberOfParticles = this.particles.length;
+   //this.spatialHash.build(this.particles);
   },
   
   collide: function(p1, p2) {
