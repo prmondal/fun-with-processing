@@ -79,13 +79,27 @@ function intersect(ray, box) {
     var t = tymin, tymin = tymax, tymax = t;
   }
   
+  //console.log("tymax: " + tymax + " , txmin: " + txmin);
+  //console.log("tymin: " + tymin + " , txmax: " + txmax);
+  
   if(tymax < txmin || tymin > txmax) return false;
   
   //update tmin and tmax
   tmin = Math.max(txmin, tymin);
   tmax = Math.min(txmax, tymax);
   
-  //stroke(255,0,0);
-  //line(ray.start.x, ray.start.y, ray.start.x + tmin * rayDir.x, ray.start.y + tmin * rayDir.y);
+  //if nearest intersection length is more than the actual ray length line segment is not intersected
+  if(tmin > p5.Vector.sub(ray.end, ray.start).mag()) return false;
+  
+  //draw hit point
+  fill(0, 255, 0);
+  ellipse(ray.start.x + rayDir.x * tmin, ray.start.y + rayDir.y * tmin, 10, 10);
+  
   return true;
+}
+
+function swap(a, b) {
+  var t = a;
+  a = b;
+  b = t;
 }
