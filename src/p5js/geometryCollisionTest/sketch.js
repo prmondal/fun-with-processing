@@ -60,8 +60,8 @@ function mouseReleased() {
 }
 
 function intersect(ray, box) {
-  //ray start is inside box and ray end is not inside box
-  if(inBox(ray.start, box) && !inBox(ray.end, box)) return true;
+  //ray start is inside box and ray end is not inside box, optional test
+  //if(inBox(ray.start, box) && !inBox(ray.end, box)) return true;
   
   var rayDir = p5.Vector.sub(ray.end, ray.start).normalize();
   var tmin, tmax;
@@ -82,9 +82,6 @@ function intersect(ray, box) {
     var t = tymin, tymin = tymax, tymax = t;
   }
   
-  //console.log("tymax: " + tymax + " , txmin: " + txmin);
-  //console.log("tymin: " + tymin + " , txmax: " + txmax);
-  
   if(tymax < txmin || tymin > txmax) return false;
   
   //update tmin and tmax
@@ -95,11 +92,22 @@ function intersect(ray, box) {
   if(tmin > p5.Vector.sub(ray.end, ray.start).mag()) return false;
   
   //if the ray is away from box no intersection
-  if(tmin < 0) return false;
+  //if(tmin < 0) return false;
+  
+  var isInBox = inBox(ray.start, box);
   
   //draw hit point
   fill(0, 255, 0);
-  ellipse(ray.start.x + rayDir.x * tmin, ray.start.y + rayDir.y * tmin, 10, 10);
+  
+  //if ray starts inside box and hits box wall
+  if(isInBox && tmax <= p5.Vector.sub(ray.end, ray.start).mag()) {
+    //draw hit point at tmax
+    ellipse(ray.start.x + rayDir.x * tmax, ray.start.y + rayDir.y * tmax, 10, 10);
+  } else if(!isInBox && tmin >= 0){
+    ellipse(ray.start.x + rayDir.x * tmin, ray.start.y + rayDir.y * tmin, 10, 10);
+  } else {//if the ray is away from box no intersection
+    return false;
+  }
   
   return true;
 }
