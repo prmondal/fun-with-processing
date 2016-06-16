@@ -60,6 +60,9 @@ function mouseReleased() {
 }
 
 function intersect(ray, box) {
+  //ray start is inside box and ray end is not inside box
+  if(inBox(ray.start, box) && !inBox(ray.end, box)) return true;
+  
   var rayDir = p5.Vector.sub(ray.end, ray.start).normalize();
   var tmin, tmax;
   
@@ -91,6 +94,9 @@ function intersect(ray, box) {
   //if nearest intersection length is more than the actual ray length line segment is not intersected
   if(tmin > p5.Vector.sub(ray.end, ray.start).mag()) return false;
   
+  //if the ray is away from box no intersection
+  if(tmin < 0) return false;
+  
   //draw hit point
   fill(0, 255, 0);
   ellipse(ray.start.x + rayDir.x * tmin, ray.start.y + rayDir.y * tmin, 10, 10);
@@ -98,8 +104,6 @@ function intersect(ray, box) {
   return true;
 }
 
-function swap(a, b) {
-  var t = a;
-  a = b;
-  b = t;
+function inBox(p, box) {
+  return p.x > box.min.x && p.x < box.max.x && p.y < box.min.y && p.y > box.max.y; //postive y axis from North to South
 }
