@@ -62,7 +62,7 @@ Room.prototype.draw = function() {
   noStroke();
   
   if(this.isPointer) {
-    fill(153, 153, 255);
+    fill(255, 0, 0);
     rect(this.corners.NW.x, this.corners.NW.y, this.width, this.height);
   } else if(this.visited) {
     fill(0, 0, 153);
