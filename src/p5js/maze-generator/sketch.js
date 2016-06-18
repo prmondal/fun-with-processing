@@ -1,7 +1,7 @@
-var m = 20, 
-    n = 20, 
-    roomWidth = 20, 
-    roomHeight = 20, 
+var m = 40, 
+    n = 40, 
+    roomWidth = 10, 
+    roomHeight = 10, 
     rooms = [];
 
 function setup() {
@@ -36,7 +36,7 @@ function generateMaze() {
   var startRoomIdx = [Math.floor(random(0, m)), Math.floor(random(0, n))];
   
   //mark visited
-  var room = rooms[startRoomIdx[0] * roomHeight + startRoomIdx[1]];
+  var room = rooms[startRoomIdx[0] * n + startRoomIdx[1]];
   room.visited = true;
   
   stack.push(room);

@@ -32,25 +32,25 @@ Room.prototype.neighbours = function(m, n, rooms) {
   
   //west room
   if(this.idx[1] - 1 >= 0) {
-    room = rooms[this.idx[0] * this.height + this.idx[1] - 1];
+    room = rooms[this.idx[0] * n + this.idx[1] - 1];
     if(!room.visited) neighbours.push(room);
   }
   
   //south room
   if(this.idx[0] + 1 < m) {
-    room = rooms[(this.idx[0] + 1) * this.height + this.idx[1]];
+    room = rooms[(this.idx[0] + 1) * n + this.idx[1]];
     if(!room.visited) neighbours.push(room);
   }
   
   //east room
   if(this.idx[1] + 1 < n) {
-    room = rooms[this.idx[0] * this.height + this.idx[1] + 1];
+    room = rooms[this.idx[0] * n + this.idx[1] + 1];
     if(!room.visited) neighbours.push(room);
   }
   
   //north room
   if(this.idx[0] - 1 >= 0) {
-    room = rooms[(this.idx[0] - 1) * this.height + this.idx[1]];
+    room = rooms[(this.idx[0] - 1) * n + this.idx[1]];
     if(!room.visited) neighbours.push(room);
   }
   
