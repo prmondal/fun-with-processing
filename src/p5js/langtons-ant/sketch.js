@@ -5,8 +5,8 @@ var cellColors = [{r: 0, g: 0, b: 0, label: 'color1'},
                   {r: 51, g: 51, b: 255, label: 'color2'}
                  ];
 
-var rows = 50;
-var cols = 50;
+var rows = 200;
+var cols = 200;
 var gridOffsetX
 var gridOffsetY;
 

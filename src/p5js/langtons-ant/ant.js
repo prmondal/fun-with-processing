@@ -16,6 +16,7 @@ function ant(cellX, cellY, rows, cols, width, height, color, cells) {
   };
   
   this.currentDirection = this.direction.NORTH;
+  this.home.isVisited = true;
   
   this.draw = function() {
     fill(this.color.r, this.color.g, this.color.b);
@@ -45,6 +46,7 @@ function ant(cellX, cellY, rows, cols, width, height, color, cells) {
     
     //toggle current cell color state
     this.home.toggleColor = !this.home.toggleColor;
-    this.home = cells[this.cellY + cols * this.cellX]
+    this.home = cells[this.cellY + cols * this.cellX];
+    this.home.isVisited = true;
   }
 };
