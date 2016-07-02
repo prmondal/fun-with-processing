@@ -105,6 +105,10 @@ function intersect(ray, box) {
     ellipse(ray.start.x + rayDir.x * tmax, ray.start.y + rayDir.y * tmax, 10, 10);
   } else if(!isInBox && tmin >= 0){
     ellipse(ray.start.x + rayDir.x * tmin, ray.start.y + rayDir.y * tmin, 10, 10);
+    
+    if(tmax <= p5.Vector.sub(ray.end, ray.start).mag()) {
+      ellipse(ray.start.x + rayDir.x * tmax, ray.start.y + rayDir.y * tmax, 10, 10);
+    }
   } else {//if the ray is away from box no intersection
     return false;
   }
