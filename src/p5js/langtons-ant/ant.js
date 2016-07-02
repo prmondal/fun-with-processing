@@ -22,7 +22,7 @@ function ant(cellX, cellY, rows, cols, width, height, color, cells) {
     rect(this.home.pos.x, this.home.pos.y, this.home.width, this.home.height); //TODO: draw actual small ant
   }
   
-  this.update = function() {//TODO: check at boundery
+  this.update = function() {
     if(this.currentDirection === this.direction.NORTH) {
       (this.home.currentColor.label === 'color1') ? this.cellX++ : this.cellX--;
       this.currentDirection = (this.home.currentColor.label === 'color1') ? this.direction.EAST : this.direction.WEST;
