@@ -25,6 +25,7 @@ function setup() {
   
   initCells();
   
+  //place ant in the center of the grid
   ant = new ant(Math.floor(rows / 2), Math.floor(cols / 2), rows, cols, cellSizeX / 2, cellSizeY / 2, antColor, cells);
 }
 

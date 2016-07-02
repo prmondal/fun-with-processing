@@ -37,6 +37,12 @@ function ant(cellX, cellY, rows, cols, width, height, color, cells) {
       this.currentDirection = (this.home.currentColor.label === 'color1') ? this.direction.NORTH : this.direction.SOUTH;
     }
     
+    //update cell idx at boundary
+    if(this.cellX < 0) this.cellX = cols - 1;
+    if(this.cellX >= cols) this.cellX = 0;
+    if(this.cellY < 0) this.cellY = rows - 1;
+    if(this.cellY >= rows) this.cellY = 0;
+    
     //toggle current cell color state
     this.home.toggleColor = !this.home.toggleColor;
     this.home = cells[this.cellY + cols * this.cellX]
