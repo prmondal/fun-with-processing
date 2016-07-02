@@ -13,6 +13,8 @@ var gridOffsetY;
 var ant;
 var antColor = {r: 255, g: 0, b: 0};
 
+var iterations = 0;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   //frameRate(1);
@@ -30,12 +32,20 @@ function draw() {
   background(0);
   drawCells();
   ant.draw();
+  drawInfo();
   
   update();
 }
 
+function drawInfo() {
+  textSize(10);
+  fill(255);
+  text("Iterations: " + iterations, 15, 15);
+}
+
 function update() {
   ant.update();
+  iterations++;
 }
 
 function initCells() {
