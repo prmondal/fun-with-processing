@@ -1,5 +1,7 @@
 Blob[] b;
 int numberOfBlobs = 10;
+boolean isEdgeEnabled = true;
+int minTh = 130, maxTh = 150;
 
 void setup() {
   size(400, 400);
@@ -26,12 +28,16 @@ void draw() {
       float c = 0;
 
       for (int i = 0; i < numberOfBlobs; i++) {
-       c += 10 * b[i].radius / (abs(x - b[i].pos.x) + abs(y - b[i].pos.y)); //diamond shape
-       //c += 10 * b[i].radius / ((x - b[i].pos.x) * (x - b[i].pos.x) + (y - b[i].pos.y) * (y - b[i].pos.y)); //circle shape
+       //c += 10 * b[i].radius / (abs(x - b[i].pos.x) + abs(y - b[i].pos.y)); //diamond shape
+       c += 500 * b[i].radius / ((x - b[i].pos.x) * (x - b[i].pos.x) + (y - b[i].pos.y) * (y - b[i].pos.y)); //circle shape
        //c += 100 * b[i].radius / (50 - dist(x, y, b[i].pos.x, b[i].pos.y)); //torus shape
       }
       
-      pixels[x + y * width] = color(c, 0, 0);
+      if(isEdgeEnabled) {
+        if(c >= minTh && c <= maxTh) pixels[x + y * width] = color(c, 0, 0);
+      } else {
+        pixels[x + y * width] = color(c, 0, 0);
+      }
     }
   }
 
