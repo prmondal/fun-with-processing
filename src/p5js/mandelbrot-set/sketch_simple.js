@@ -1,6 +1,6 @@
 var w = 600;
 var h = 600;
-var s = 1.5;
+var s = 2.0;
 
 function setup() {
 	createCanvas(h, w);
@@ -25,7 +25,7 @@ function draw() {
 
 function inMandelBrotSet(x, y) {
 	var cnt = 0;
-	var m = 1000;
+	var m = 100;
     var fx = 0;
     var fy = 0;
     
@@ -34,7 +34,7 @@ function inMandelBrotSet(x, y) {
         
     while(cnt < m) {
         var v = a * a + b * b;
-        if(v * v > 4) return false;
+        if(v > 4) return false;
         
         a = fx * fx - fy * fy + x;
         b = 2 * fx * fy + y;

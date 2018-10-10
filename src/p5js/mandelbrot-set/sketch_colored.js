@@ -1,6 +1,6 @@
 var w = 600;
 var h = 600;
-var s = 1.5;
+var s = 2.0;
 var maxIteration = 100;
 
 function setup() {
@@ -34,7 +34,7 @@ function getIterationCountForMandelBrotSet(x, y) {
         
     while(it < maxIteration) {
         var v = a * a + b * b;
-        if(v * v > 4) break;
+        if(v > 4) break;
         
         a = fx * fx - fy * fy + x;
         b = 2 * fx * fy + y;
