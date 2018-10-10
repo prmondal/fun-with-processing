@@ -1,7 +1,7 @@
 var w = 600;
 var h = 600;
 var s = 1.5;
-var maxIteration = 1000;
+var maxIteration = 100;
 
 function setup() {
 	createCanvas(h, w);
@@ -18,8 +18,7 @@ function draw() {
 			var y = map(j, 0, w, -s, s);
 
             var it = getIterationCountForMandelBrotSet(x, y);
-
-            stroke(255 * it / maxIteration, 255, 200);
+            stroke(255 * it / maxIteration, 255, 255);
 			point(i, j);
 		}
 	}
