@@ -2,10 +2,6 @@ var w = 1920;
 var h = 1080;
 var xs = 2.0;
 var ys = xs * h / w;
-
-var cx = -0.761574; //try -0.5, -0.6, coolness
-var cy = -0.0847596;
-
 var maxIteration = 100;
 
 function setup() {
@@ -23,7 +19,7 @@ function draw() {
 			var y = map(i, 0, h, -ys, ys);
 
             var it = getIterationCountForMandelBrotSet(x, y);
-            stroke(255 * it / maxIteration, 255, 255);
+            stroke(map(it, 0, maxIteration, 0, 255), 255, 255);
 			point(j, i);
 		}
 	}
@@ -31,16 +27,26 @@ function draw() {
 
 function getIterationCountForMandelBrotSet(x, y) {
 	var it = 0;
+	var fx = 0;
+    var fy = 0;
+    
+    var a = x;
+    var b = y;
         
     while(it < maxIteration) {
-        if(x * x + y * y > 4) break;
+        var v = a * a + b * b;
+        if(v > 4) break;
         
-        var xtemp = x * x - y * y;
-        y = 2 * x * y + cy;
-        x = xtemp + cx;
+        a = fx * fx - fy * fy + x;
+        b = 2 * fx * fy + y;
+        
+        fx = a;
+        fy = b;
 
         it++;
     }
 
-    return it;
+    if(it == maxIteration) return it;
+
+    return it + 1 - Math.log(Math.log(a*a+b*b)/Math.log(4)) / Math.log(2);
 }
