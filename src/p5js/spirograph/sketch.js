@@ -20,11 +20,8 @@ function draw() {
 		var x = R * ((1-k)*Math.cos(t) + l*k*Math.cos((1-k)*t/k));
 		var y = R * ((1-k)*Math.sin(t) - l*k*Math.sin((1-k)*t/k));
 		
-		x = map(x, -R, R, 0, w);
-		y = map(y, -R, R, 0, h);
-
 		stroke(255);
-		point(x, y);
+		point(x+w/2, y+h/2);
 
 		noFill();
 		stroke(255,0,0);
