@@ -1,11 +1,20 @@
 var w = 600;
 var h = 600;
 
-var R = 100;
-var r = 5;
-var k = r/R;
+var R = 105;
+var r = 75;
+var l = 40;
 
-var l = 20;
+var noRotations = R / gcd(r, R);
+
+function gcd(a, b) {
+	while(a != b) {
+		if(a > b) a = a - b;
+		else b = b - a;
+	}
+
+	return a;
+}
 
 function setup() {
 	createCanvas(w, h);
@@ -14,27 +23,16 @@ function setup() {
 
 function draw() {
 	background(0);
-	var deltaAngle = (l > 1) ? PI / (360 * l) : PI / 360;
+	var deltaAngle = PI/1800;
 
-	for(var t = 0; t <= TWO_PI; t += deltaAngle) {
-		var x = R * ((1-k)*Math.cos(t) + l*k*Math.cos((1-k)*t/k));
-		var y = R * ((1-k)*Math.sin(t) - l*k*Math.sin((1-k)*t/k));
+	for(var t = 0; t <= noRotations * TWO_PI; t += deltaAngle) {
+		var a = R - r;
+		var b = a * t / r;
+
+		var x = a * Math.cos(t) + l * Math.cos(b);
+		var y = a * Math.sin(t) - l * Math.sin(b);
 		
-		stroke(0,255,0);
-		point(x+w/2, y+h/2);
-
-		/*noFill();
-		stroke(255,0,0);
-		ellipse(w/2,h/2,2*R);
-
-		noFill();
 		stroke(0,0,255);
-		ellipse(w/2+R-r,h/2,2*r);
-
-		push();
-		strokeWeight(4);
-		stroke(0,255,255);
-		point(w/2+R-(1-l)*r,h/2);
-		pop();*/
+		point(x+w/2, y+h/2);
 	}
 }
