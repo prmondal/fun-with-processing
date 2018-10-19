@@ -23,13 +23,13 @@ function setup() {
 	createCanvas(w, h);
 	colorMode(HSB);
 
-	RSlider = createSlider(1, w/2, 105);
+	RSlider = createSlider(1, w/2, R);
 	RSlider.position(sliderPosXOffset, sliderPosYOffset);
 	
-	rSlider = createSlider(1, R, 75);
+	rSlider = createSlider(1, R, r);
 	rSlider.position(sliderPosXOffset, 2 * sliderPosYOffset);
 	
-	lSlider = createSlider(0, w, 40);
+	lSlider = createSlider(0, w, l);
 	lSlider.position(sliderPosXOffset, 3 * sliderPosYOffset);
 
 	colorSlider = createSlider(0, 255, 255);
