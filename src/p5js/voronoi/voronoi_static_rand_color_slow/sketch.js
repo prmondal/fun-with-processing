@@ -10,6 +10,10 @@ class Point {
     this.x = x;
     this.y = y;
   }
+
+  isEqual(p) {
+    return this.x == p.x && this.y == p.y;
+  }
 }
 
 let DISTANCE_TYPE = {
@@ -17,8 +21,18 @@ let DISTANCE_TYPE = {
   "MANHATTAN": 2
 };
 
+let CELL_COLORS = [
+  {r:255, g:0, b:0},
+  {r:0, g:255, b:0},
+  {r:0, g:0, b:255},
+  {r:255, g:255, b:0},
+  {r:0, g:255, b:255},
+  {r:255, g:0, b:255}
+];
+
 let distanceType = DISTANCE_TYPE.EUCLIDEAN;
 let sites = [];
+let cellColors = [];
 let voronoiMap = null;
 
 function distance(p1, p2) {
@@ -30,10 +44,11 @@ function distance(p1, p2) {
 }
 
 function initSites() {
-  for (let i = siteSpaceX; i < w; i += siteSpaceX) {
-    for (let j = siteSpaceY; j < h; j += siteSpaceY) {
-      sites.push(new Point(i, j));
-    }
+  for(let i = 1; i <= 50; i++) {
+    let x = floor(randomGaussian(w/2, w/3));
+    let y = floor(randomGaussian(h/2, h/3));
+    sites.push(new Point(x, y));
+    cellColors.push(CELL_COLORS[floor(random(CELL_COLORS.length))]);
   }
 }
 
@@ -50,43 +65,35 @@ function initVoronoiMap() {
   }
 }
 
-function drawSites() {
-  for (const s of sites) {
-    fill(0, 120, 255);
-    noStroke();
-    ellipse(s.x, s.y, siteRadius, siteRadius);
-  }
-}
-
 function drawVoronoi() {
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
       let pixCoord = new Point(x, y);
       let v = voronoiMap[x + y * w];
 
-      for (const s of sites) {
+      for (let i in sites) {
+        let s = sites[i];
         let siteDist = distance(s, pixCoord);
 
         if (abs(siteDist - v.minDist) < 1e-5) {
-          let k = s.x+"-"+s.y;
-          if (!v.nearest[k]) v.nearest[k] = s;
+          if (v.nearest.indexOf(i) == -1) v.nearest.push(i);
         } else if (siteDist < v.minDist) {
           v.minDist = siteDist;
-          v.nearest = {};
-          v.nearest[s.x+"-"+s.y] = s;
+          v.nearest = [i];
         }
       }
       
       if(filledSmoothVoronoi) {
-        if(v.minDist >= siteRadius/2) {
-          let b = 255 * (siteSpaceX - v.minDist) / siteSpaceX;
+        if(v.minDist >= 0) {
+          let b = (siteSpaceX - v.minDist) / siteSpaceX;
           b = constrain(b, 0, 255);
-          stroke(b);
+          let c = cellColors[v.nearest[0]];
+          stroke(c.r*b, c.g*b, c.b*b);
           point(x,y);
         }
       } else {
         //draw edges (points with more than one nearest site)
-        if (Object.keys(v.nearest).length > 1) {
+        if (v.nearest.length > 1) {
           stroke(255, 0, 0);
           point(x, y);
         }
@@ -105,7 +112,5 @@ function setup() {
 
 function draw() {
   background(255);
-
-  drawSites();
   drawVoronoi();
 }
